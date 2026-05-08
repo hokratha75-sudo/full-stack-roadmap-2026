@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ផែនទីបង្ហាញផ្លូវ Full-Stack ឆ្នាំ ២០២៦</title>
+    
+    <!-- Chosen Palette: Warm Neutrals with Teal Accents -->
+    <!-- Application Structure Plan: A split-pane layout for desktop (stacked on mobile). Left pane acts as an interactive timeline/navigation menu representing the roadmap steps. Right pane dynamically updates to show detailed content, key technologies, and a data visualization (chart) related to the selected step. This structure allows users to explore the roadmap non-linearly while understanding the progression. -->
+    <!-- Visualization & Content Choices: 
+         - Timeline (HTML/CSS): To show the progression of steps clearly. 
+         - Dynamic Text Panel (Vanilla JS): To display detailed lesson content without overwhelming the screen.
+         - Radar/Doughnut Chart (Chart.js): To visualize the balance of skills (Frontend vs Backend vs Database) required at each stage.
+         - Library: Chart.js for data visualization. HTML/Tailwind for structural graphics. NO SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Battambang', cursive, sans-serif;
+            background-color: #FDFBF7; /* Warm neutral background */
+            color: #3F3F46; /* Dark gray for text */
+        }
+        
+        /* Custom Scrollbar for inner content */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F4F4F5; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4D4D8; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A1A1AA; 
+        }
+
+        /* Chart Container Constraint */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Timeline connecting line */
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            top: 24px;
+            bottom: 0;
+            left: 20px;
+            width: 2px;
+            background-color: #E4E4E7;
+            z-index: 0;
+        }
+        
+        /* Active state transitions */
+        .step-btn {
+            transition: all 0.3s ease;
+        }
+        .step-btn.active {
+            background-color: #F0FDFA; /* Light teal bg */
+            border-color: #0D9488; /* Teal border */
+        }
+        .step-btn.active .step-icon {
+            background-color: #0D9488;
+            color: white;
+            transform: scale(1.1);
+        }
+        .step-icon {
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+    <!-- Header / Hero Section -->
+    <header class="bg-white border-b border-zinc-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-black text-zinc-800 tracking-tight">
+                        🚀 ផែនទីបង្ហាញផ្លូវ Full-Stack ឆ្នាំ ២០២៦
+                    </h1>
+                    <p class="mt-2 text-zinc-500 text-sm md:text-base">
+                        មេរៀនចាប់ពីជំហានទី១ សម្រាប់អ្នកចាប់ផ្តើមដំបូង ឈានទៅរកការបង្កើតប្រព័ន្ធ Web App ពេញលេញ។
+                    </p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        
+        <div class="mb-8 bg-teal-50 border-l-4 border-teal-600 p-4 rounded-r-lg">
+            <p class="text-teal-900 text-sm md:text-base font-medium">
+                <strong>សេចក្តីផ្តើម៖</strong> ការអភិវឌ្ឍន៍ Full-Stack គឺការចេះទាំងផ្នែកខាងមុខ (Frontend) ដែលអ្នកប្រើប្រាស់មើលឃើញ និងផ្នែកខាងក្រោយ (Backend & Database) ដែលគ្រប់គ្រងទិន្នន័យ និងតក្កវិជ្ជា (Logic)។ សូមចុចលើជំហាននីមួយៗខាងក្រោមដើម្បីស្វែងយល់លម្អិត។
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Pane: Interactive Timeline -->
+            <div class="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 relative timeline-line">
+                <h2 class="text-xl font-bold mb-6 text-zinc-800">ដំណាក់កាលសិក្សា</h2>
+                
+                <div id="timeline-container" class="space-y-4 relative z-10">
+                    <!-- Timeline items injected by JS -->
+                </div>
+            </div>
+
+            <!-- Right Pane: Content Display & Visualization -->
+            <div class="lg:col-span-8 flex flex-col space-y-6">
+                
+                <!-- Dynamic Content Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 md:p-8 min-h-[300px]">
+                    <div id="content-display" class="fade-in">
+                        <!-- Content injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Visualization Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 md:p-8">
+                    <h3 class="text-lg font-bold text-zinc-800 mb-2 text-center" id="chart-title">កម្រិតនៃការប្រើប្រាស់ជំនាញក្នុងជំហាននេះ</h3>
+                    <p class="text-sm text-zinc-500 text-center mb-6">តំណាងឱ្យចំណែកនៃការផ្តោតអារម្មណ៍ (Frontend, Backend, Database)</p>
+                    
+                    <div class="chart-container">
+                        <canvas id="skillsChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-zinc-800 py-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-zinc-400 text-sm mb-2">បង្កើតឡើងដើម្បីជាជំនួយក្នុងការសិក្សា Full-Stack Web Development។</p>
+            <p class="text-teal-400 text-sm font-semibold">រៀបរៀងដោយ៖ Ratha Developer</p>
+        </div>
+    </footer>
+
+    <!-- Application Logic -->
+    <script>
+        // Data Structure for the Roadmap
+        const roadmapData = [
+            {
+                id: 1,
+                icon: "🌐",
+                title: "ជំហានទី ១: គ្រឹះនៃ Frontend",
+                shortDesc: "HTML, CSS & JavaScript",
+                fullDesc: `
+                    <h3 class="text-2xl font-bold text-zinc-800 mb-4">គ្រឹះនៃការបង្កើតវិបសាយ</h3>
+                    <p class="mb-4 text-zinc-600 leading-relaxed">ជំហានដំបូងបំផុត គឺការស្វែងយល់ពីរបៀបដែល Web Browser ដំណើរការ។ អ្នកមិនចាំបាច់ប្រញាប់ទៅរៀន Framework ទេ ត្រូវយល់ពីគ្រឹះសិន៖</p>
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-start">
+                            <span class="text-teal-600 font-bold mr-2">&#10003;</span>
+                            <div><strong>HTML (Structure):</strong> រៀនពី Tags សំខាន់ៗ, Semantic HTML សម្រាប់ SEO និង Accessibility។</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-teal-600 font-bold mr-2">&#10003;</span>
+                            <div><strong>CSS (Styling):</strong> រៀនពី Box Model, Flexbox សម្រាប់ការរៀបចំ Layout និង CSS Grid ព្រមទាំង Responsive Design។</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-teal-600 font-bold mr-2">&#10003;</span>
+                            <div><strong>Vanilla JavaScript (Logic):</strong> មូលដ្ឋានគ្រឹះនៃ Programming (Variables, Functions, Loops), DOM Manipulation (ការផ្លាស់ប្តូរ HTML តាមរយៈ JS) និង Event Listeners។</div>
+                        </li>
+                    </ul>
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-sm text-yellow-800">
+                        <strong>គន្លឹះ:</strong> ព្យាយាមបង្កើតវិបសាយធម្មតាមួយ (Portfolio ឬ Landing Page) ដោយមិនប្រើ Framework ណាមួយឡើយ មុននឹងបន្តទៅជំហានបន្ទាប់។
+                    </div>
+                `,
+                chartData: [90, 0, 0, 10], // Frontend, Backend, Database, Other
+            },
+            {
+                id: 2,
+                icon: "⚛️",
+                title: "ជំហានទី ២: Frontend Framework & UI",
+                shortDesc: "React.js & Tailwind CSS",
+                fullDesc: `
+                    <h3 class="text-2xl font-bold text-zinc-800 mb-4">ធ្វើឱ្យ Frontend មានភាពទំនើប និងរហ័ស</h3>
+                    <p class="mb-4 text-zinc-600 leading-relaxed">នៅពេលយល់ពីគ្រឹះហើយ យើងចាប់ផ្តើមប្រើឧបករណ៍ដែលជួយសរសេរកូដបានលឿន និងមានរបៀបរៀបរយ។</p>
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-start">
+                            <span class="text-teal-600 font-bold mr-2">&#10003;</span>
+                            <div><strong>React.js:</strong> ជាបណ្ណាល័យដ៏ពេញនិយមបំផុត។ រៀនពី Components, Props, State (useState, useEffect)។</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-teal-600 font-bold mr-2">&#10003;</span>
+                            <div><strong>State Management (Zustand):</strong> ដូចដែលបានរៀបរាប់មុននេះ ពេលដែល App ធំ ការគ្រប់គ្រងទិន្នន័យឆ្លងកាត់ Components ត្រូវការឧបករណ៍ដូចជា Zustand ព្រោះវាស្រួល និងលឿន។</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-teal-600 font-bold mr-2">&#10003;</span>
+                            <div><strong>Tailwind CSS:</strong> ជា Utility-first CSS framework ដែលអនុញ្ញាតឱ្យយើង Design ដោយផ្ទាល់ក្នុង HTML (Class names) ធ្វើឱ្យការបង្កើត UI លឿនខ្លាំង។</div>
+                        </li>
+                    </ul>
+                `,
+                chartData: [85, 5, 0, 10],
+            },
+            {
+                id: 3,
+                icon: "⚙️",
+                title: "ជំហានទី ៣: គ្រឹះនៃ Backend",
+                shortDesc: "Node.js & Express.js",
+                fullDesc: `
+                    <h3 class="text-2xl font-bold text-zinc-800 mb-4">នៅពីក្រោយឆាក (Behind the Scenes)</h3>
+                    <p class="mb-4 text-zinc-600 leading-relaxed">Backend គឺជាកន្លែងដែលយើងសរសេរ Logic ធំៗ ដូចជាការបញ្ជាក់អត្តសញ្ញាណអ្នកប្រើប្រាស់ (Authentication) និងរៀបចំទិន្នន័យដើម្បីបញ្ជូនទៅ Frontend។</p>
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-start">
+                            <span class="text-teal-600 font-bold mr-2">&#10003;</span>
+                            <div><strong>Node.js:</strong> អនុញ្ញាតឱ្យយើងដំណើរការ JavaScript នៅលើ Server (មិនមែនតែលើ Browser ទេ)។</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-teal-600 font-bold mr-2">&#10003;</span>
+                            <div><strong>Express.js:</strong> ជា Framework សម្រាប់ Node.js ជួយឱ្យការបង្កើត Server និង API (Application Programming Interface) កាន់តែងាយស្រួល។</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-teal-600 font-bold mr-2">&#10003;</span>
+                            <div><strong>RESTful APIs:</strong> រៀនពីរបៀបបង្កើត Routes (GET, POST, PUT, DELETE) ដើម្បីឱ្យ Frontend អាចទាញយក ឬបញ្ជូនទិន្នន័យមក Backend បាន។</div>
+                        </li>
+                    </ul>
+                `,
+                chartData: [20, 70, 0, 10],
+            },
+            {
+                id: 4,
+                icon: "🗄️",
+                title: "ជំហានទី ៤: មូលដ្ឋានទិន្នន័យ",
+                shortDesc: "SQL (PostgreSQL) ឬ NoSQL (MongoDB)",
+                fullDesc: `
+                    <h3 class="text-2xl font-bold text-zinc-800 mb-4">កន្លែងរក្សាទុកទិន្នន័យ (Databases)</h3>
+                    <p class="mb-4 text-zinc-600 leading-relaxed">ដើម្បីឱ្យ App របស់អ្នកចងចាំទិន្នន័យ (ឧ. គណនីអ្នកប្រើប្រាស់ ការបញ្ជាទិញ) អ្នកត្រូវភ្ជាប់ Backend ទៅកាន់ Database។</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-zinc-50 p-4 rounded border border-zinc-200">
+                            <h4 class="font-bold text-zinc-800 mb-2">Relational (SQL)</h4>
+                            <p class="text-sm text-zinc-600">រក្សាទិន្នន័យជាទម្រង់តារាងមានទំនាក់ទំនងគ្នា។ ឧទាហរណ៍៖ <strong>PostgreSQL</strong>, MySQL។ ល្អសម្រាប់ទិន្នន័យដែលមានរចនាសម្ព័ន្ធច្បាស់លាស់។</p>
+                        </div>
+                        <div class="bg-zinc-50 p-4 rounded border border-zinc-200">
+                            <h4 class="font-bold text-zinc-800 mb-2">Non-Relational (NoSQL)</h4>
+                            <p class="text-sm text-zinc-600">រក្សាទិន្នន័យជាទម្រង់ Document (ដូច JSON)។ ឧទាហរណ៍៖ <strong>MongoDB</strong>។ ល្អសម្រាប់ភាពបត់បែន និងទិន្នន័យដែលផ្លាស់ប្តូរញឹកញាប់។</p>
+                        </div>
+                    </div>
+                    <p class="text-zinc-600"><strong>ORM / ODM:</strong> អ្នកនឹងត្រូវរៀនប្រើប្រាស់បណ្ណាល័យដូចជា Prisma ឬ Mongoose ដើម្បីឱ្យ Node.js ទាក់ទងជាមួយ Database បានស្រួល។</p>
+                `,
+                chartData: [10, 40, 50, 0],
+            },
+            {
+                id: 5,
+                icon: "🚀",
+                title: "ជំហានទី ៥: ការដាក់ឱ្យដំណើរការ (Deployment)",
+                shortDesc: "Vercel, Render & CI/CD",
+                fullDesc: `
+                    <h3 class="text-2xl font-bold text-zinc-800 mb-4">ការបង្ហោះវិបសាយទៅកាន់អ៊ីនធឺណិត (Hosting)</h3>
+                    <p class="mb-4 text-zinc-600 leading-relaxed">ជំហានចុងក្រោយគឺការដាក់បញ្ចូលកូដរបស់អ្នកទៅលើម៉ាស៊ីនមេ (Server) ជាក់ស្តែង ដើម្បីឱ្យមនុស្សទូទាំងពិភពលោកអាចចូលមើលបាន។</p>
+                    <div class="space-y-4 mb-6">
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                            <h4 class="font-bold text-blue-900 mb-1 flex items-center">
+                                <span class="mr-2">🌐</span> Frontend Hosting
+                            </h4>
+                            <p class="text-sm text-blue-800">
+                                សម្រាប់គម្រោង React/Next.js ជម្រើសដែលពេញនិយម និងងាយស្រួលបំផុតគឺ <strong>Vercel</strong> ឬ <strong>Netlify</strong>។ ពួកវាភ្ជាប់ដោយផ្ទាល់ជាមួយ GitHub របស់អ្នក ហើយធ្វើការ Deploy ដោយស្វ័យប្រវត្តិរាល់ពេលអ្នក Push code ថ្មី។ អ្វីដែលពិសេសគឺ វាផ្តល់នូវគម្រោងឥតគិតថ្លៃ (Free Tier) ដ៏ល្អឥតខ្ចោះសម្រាប់ការសិក្សា។
+                            </p>
+                        </div>
+                        
+                        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded">
+                            <h4 class="font-bold text-orange-900 mb-1 flex items-center">
+                                <span class="mr-2">⚙️</span> Backend Hosting
+                            </h4>
+                            <p class="text-sm text-orange-800">
+                                សម្រាប់ Node.js/Express.js backend ជម្រើសដ៏ល្អគឺ <strong>Render</strong>, <strong>Railway</strong> ឬ <strong>Fly.io</strong>។ សេវាកម្មទាំងនេះងាយស្រួលតម្លើងជាងការជួលម៉ាស៊ីនមេ (VPS) ផ្ទាល់ (ដូចជា DigitalOcean ឬ AWS) ហើយក៏មានជម្រើសឥតគិតថ្លៃផងដែរ។
+                            </p>
+                        </div>
+                        
+                        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                            <h4 class="font-bold text-green-900 mb-1 flex items-center">
+                                <span class="mr-2">🗄️</span> Database Hosting
+                            </h4>
+                            <p class="text-sm text-green-800">
+                                កុំរក្សាទុកទិន្នន័យលើម៉ាស៊ីនមេតែមួយជាមួយកូដរបស់អ្នក។ ប្រើប្រាស់សេវាកម្មគ្រប់គ្រងមូលដ្ឋានទិន្នន័យ (Managed Databases)។
+                                <br>- <strong>MongoDB:</strong> ប្រើប្រាស់ <strong>MongoDB Atlas</strong>។
+                                <br>- <strong>PostgreSQL:</strong> ប្រើប្រាស់ <strong>Supabase</strong> ឬ <strong>Neon</strong>។
+                            </p>
+                        </div>
+                    </div>
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-start">
+                            <span class="text-teal-600 font-bold mr-2">&#10003;</span>
+                            <div><strong>Git & GitHub:</strong> មុននឹងអាច Hosting បាន អ្នកត្រូវតែចេះប្រើ Git ដើម្បីរក្សាទុកកូដរបស់អ្នក (Version Control) ជាមុនសិន។</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-teal-600 font-bold mr-2">&#10003;</span>
+                            <div><strong>CI/CD ត្រួសៗ:</strong> ការយល់ដឹងពីការដាក់ឱ្យដំណើរការដោយស្វ័យប្រវត្តិ (Continuous Integration/Continuous Deployment) នៅពេលមានការផ្លាស់ប្តូរកូដ។</div>
+                        </li>
+                    </ul>
+                `,
+                chartData: [20, 20, 20, 40], // Represents DevOps/Tools balance
+            }
+        ];
+
+        // Global state
+        let currentStepId = 1;
+        let chartInstance = null;
+
+        // Elements
+        const timelineContainer = document.getElementById('timeline-container');
+        const contentDisplay = document.getElementById('content-display');
+
+        // Initialization
+        function init() {
+            renderTimeline();
+            updateContent(currentStepId);
+            initChart();
+        }
+
+        // Render Timeline items
+        function renderTimeline() {
+            timelineContainer.innerHTML = '';
+            roadmapData.forEach((step, index) => {
+                const isLast = index === roadmapData.length - 1;
+                
+                const btn = document.createElement('button');
+                btn.className = `step-btn w-full text-left bg-white border-2 border-zinc-100 rounded-xl p-4 flex items-center group hover:border-teal-300 relative z-10 focus:outline-none ${currentStepId === step.id ? 'active' : ''}`;
+                btn.onclick = () => selectStep(step.id);
+                
+                btn.innerHTML = `
+                    <div class="step-icon w-10 h-10 rounded-full bg-zinc-100 text-zinc-600 flex items-center justify-center text-lg shadow-sm border border-zinc-200 mr-4 shrink-0">
+                        ${step.icon}
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-zinc-800">${step.title}</h4>
+                        <p class="text-xs text-zinc-500 mt-1">${step.shortDesc}</p>
+                    </div>
+                `;
+                timelineContainer.appendChild(btn);
+            });
+        }
+
+        // Handle step selection
+        function selectStep(id) {
+            if (currentStepId === id) return; // Prevent unnecessary re-renders
+            currentStepId = id;
+            
+            // Re-render timeline to update active classes
+            renderTimeline();
+            
+            // Trigger animation
+            contentDisplay.classList.remove('fade-in');
+            void contentDisplay.offsetWidth; // trigger reflow
+            contentDisplay.classList.add('fade-in');
+            
+            // Update content & chart
+            updateContent(id);
+            updateChart(id);
+        }
+
+        // Update the main content pane
+        function updateContent(id) {
+            const stepData = roadmapData.find(s => s.id === id);
+            if (stepData) {
+                contentDisplay.innerHTML = stepData.fullDesc;
+            }
+        }
+
+        // Chart.js Configuration
+        function initChart() {
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+            const initialData = roadmapData[0].chartData;
+
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Frontend', 'Backend', 'Database', 'Tools/DevOps'],
+                    datasets: [{
+                        data: initialData,
+                        backgroundColor: [
+                            '#0D9488', // Teal 600
+                            '#F97316', // Orange 500
+                            '#3B82F6', // Blue 500
+                            '#8B5CF6'  // Violet 500
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: { family: "'Battambang', sans-serif" }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
+        }
+
+        // Update Chart Data based on selected step
+        function updateChart(id) {
+            const stepData = roadmapData.find(s => s.id === id);
+            if (stepData && chartInstance) {
+                chartInstance.data.datasets[0].data = stepData.chartData;
+                chartInstance.update();
+            }
+        }
+
+        // Run initialization when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
